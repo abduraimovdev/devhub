@@ -36,18 +36,22 @@ class DevLog {
   /// interceptor'idan yoki qo'lda chaqiriladi (README'ga qarang).
   static void apiError({
     required int statusCode,
-    required String method,
-    required String url,
+    String method = '',
+    String url = '',
     String? message,
     int? durationMs,
   }) {
     if (statusCode == 200 || statusCode == 201) return;
-    _enqueue('api', message ?? '$method $url → $statusCode', {
-      'statusCode': statusCode,
-      'method': method,
-      'url': url,
-      if (durationMs != null) 'durationMs': durationMs,
-    });
+    _enqueue(
+      'api',
+      message ?? '$method $url → $statusCode'.trim(),
+      {
+        'statusCode': statusCode,
+        if (method.isNotEmpty) 'method': method,
+        if (url.isNotEmpty) 'url': url,
+        if (durationMs != null) 'durationMs': durationMs,
+      },
+    );
   }
 
   /// Login natijasi yoki urinishi (telefon avtomatik maskalanadi).

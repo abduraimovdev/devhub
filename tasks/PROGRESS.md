@@ -34,9 +34,11 @@ devhub qurish bosqichlari. "davom ettir" deyilsa — birinchi belgilanmagan vazi
 ## Phase 5 — Dozone POS ulash
 - [x] **5a** Flutter `devlog_client` paketi (`clients/flutter/devlog_client/`) ✅ (2026-06-20)
       crash hooks + apiError + login + freeze; xotira navbati + batch; klient scrub; testlar
-- [ ] **5b** Dozone POS'ga ulash: `DevLog.init` + `runZonedGuarded` + Dio interceptor
-- [ ] **5b** Backend (Serverpod) login eventlari → `POST /v1/log` (server biladi)
-- [ ] (prerekvizit) devhub'ni GitHub'ga push (git-dependency uchun) yoki lokal `path:` dep
+- [x] (prerekvizit) devhub GitHub'ga push: **github.com/abduraimovdev/devhub** (private)
+- [x] **5b** Dozone POS ulandi: git-dep (resolved 79930c8) + `DevLog.init` (crash) + `DevLog.login` (muvaffaqiyatli login). `flutter analyze` toza.
+- [ ] **5b** API xato (Serverpod) → markaziy hook (ErrorHandler) orqali `DevLog.apiError`
+- [ ] **5b** Backend (Serverpod) login URINISHLARI → `POST /v1/log` (server biladi; redeploy kerak)
+- [ ] (sir) `DEVLOG_URL` + `DEVLOG_API_KEY` ni `--dart-define` bilan berish (deploy + /newproject dan keyin)
 
 ## Phase 5 — Dozone POS ulash
 - [ ] SDK ulash (crash/API/login) + backend login eventlari + backup target

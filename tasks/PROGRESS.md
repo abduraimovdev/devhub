@@ -36,12 +36,11 @@ devhub qurish bosqichlari. "davom ettir" deyilsa — birinchi belgilanmagan vazi
       crash hooks + apiError + login + freeze; xotira navbati + batch; klient scrub; testlar
 - [x] (prerekvizit) devhub GitHub'ga push: **github.com/abduraimovdev/devhub** (private)
 - [x] **5b** Dozone POS ulandi: git-dep (resolved 79930c8) + `DevLog.init` (crash) + `DevLog.login` (muvaffaqiyatli login). `flutter analyze` toza.
-- [ ] **5b** API xato (Serverpod) → markaziy hook (ErrorHandler) orqali `DevLog.apiError`
-- [ ] **5b** Backend (Serverpod) login URINISHLARI → `POST /v1/log` (server biladi; redeploy kerak)
-- [ ] (sir) `DEVLOG_URL` + `DEVLOG_API_KEY` ni `--dart-define` bilan berish (deploy + /newproject dan keyin)
+- [x] **5b** API xato (Serverpod/Dio) → markaziy `ErrorHandler.onApiError` → `DevLog.apiError` ✅
+- [x] **5b** Backend login URINISHLARI: `business/devlog.dart` + auth_endpoint (OTP/PIN/parol fail) ✅ (redeploy + backend env kerak)
+- [ ] (sir) `DEVLOG_URL`+`DEVLOG_API_KEY`: ilovalarga `--dart-define`, backendga Railway env
 
-## Phase 5 — Dozone POS ulash
-- [ ] SDK ulash (crash/API/login) + backend login eventlari + backup target
-
-## Phase 6 — Boshqalar
-- [ ] Business · Admin · Qrio · Sozly
+## Phase 6 — Boshqalar  ✅ (2026-06-20)
+- [x] **Business** ulandi: git-dep + `DevLog.init` (crash) + `ErrorHandler.onApiError` hook
+- [x] **Admin** (web) ulandi: git-dep + hook; devhub'ga **CORS** qo'shildi (brauzer POST)
+- [ ] Qrio · Sozly — alohida repolar (men ko'ra olmayman). Pattern: git-dep + `DevLog.init` + `/newproject` + dart-define (docs/07)

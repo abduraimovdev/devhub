@@ -26,12 +26,26 @@ class IngestServer {
   static const Duration _cacheTtl = Duration(minutes: 5);
   final Map<String, _CachedProject> _cache = {};
 
+  static const Map<String, String> _cors = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Api-Key',
+  };
+
   Handler get handler {
     final router = Router()
       ..get('/health', (Request r) => Response.ok('ok'))
       ..post('/v1/log', _log)
       ..post('/v1/log/batch', _batch);
-    return router.call;
+    // CORS — admin (Flutter Web) brauzeridan cross-origin POST uchun.
+    Middleware corsMw() => (inner) => (req) async {
+          if (req.method == 'OPTIONS') {
+            return Response.ok('', headers: _cors);
+          }
+          final res = await inner(req);
+          return res.change(headers: _cors);
+        };
+    return const Pipeline().addMiddleware(corsMw()).addHandler(router.call);
   }
 
   Future<Project?> _resolve(String? apiKey, DateTime now) async {

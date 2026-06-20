@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:devhub/devhub.dart';
+import 'package:devhub/src/backup/scheduler.dart';
 import 'package:devhub/src/ingest/bot.dart';
 import 'package:devhub/src/ingest/server.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -39,7 +40,35 @@ Future<void> main() async {
   );
   stdout.writeln('ingest: http://${server.address.address}:${server.port}');
 
-  // 2) Telegram bot (long-polling — bloklaydi; server event-loop'da davom etadi).
+  // 2) Ixtiyoriy: backup'ni SHU servis ichida jadvalga solish — alohida cron
+  //    servis SHART EMAS. `BACKUP_CRON_HOURS_UTC` (masalan "0,17" = 05:00/22:00
+  //    Toshkent) bo'sh bo'lsa o'chiq. Image'da pg_dump bor (postgres:17).
+  final backupHours = (Platform.environment['BACKUP_CRON_HOURS_UTC'] ?? '')
+      .split(',')
+      .map((s) => int.tryParse(s.trim()))
+      .whereType<int>()
+      .where((h) => h >= 0 && h <= 23)
+      .toList();
+  if (backupHours.isNotEmpty) {
+    final r2 = cfg.r2 == null ? null : R2Uploader(cfg.r2!);
+    final runner = BackupRunner(config: cfg, telegram: telegram, r2: r2);
+    BackupScheduler(
+      hoursUtc: backupHours,
+      run: () async {
+        var targets = await registry.activeBackupTargets();
+        if (targets.isEmpty) {
+          targets = BackupRunner.targetsFromEnv(
+            cfg.databasesEnv,
+            backupTopicId: cfg.backupTopicId,
+          );
+        }
+        await runner.run(targets);
+      },
+    ).start();
+  }
+
+  // 3) Telegram bot (long-polling — bloklaydi; server+scheduler event-loop'da
+  //    davom etadi).
   final bot = DevHubBot(config: cfg, registry: registry, telegram: telegram);
   await bot.start();
 }

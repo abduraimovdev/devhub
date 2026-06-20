@@ -1,0 +1,30 @@
+# Dart
+.dart_tool/
+build/
+.packages
+
+# Secrets / config
+.env
+.env.local
+
+# Backup artefaktlari (hech qachon repo'ga tushmasin)
+*.sql
+*.sql.gz
+*.dump
+backups/
+
+# Loglar
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# pubspec.lock — bu APPLICATION (paket emas), shuning uchun lock'ni
+# COMMIT qilamiz (ignore qilinmaydi).

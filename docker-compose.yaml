@@ -1,0 +1,40 @@
+# Lokal dev: registr Postgres + ingest web. (Windows: bir xil buyruqlar.)
+# Backup'ni bir marta sinash:  docker compose run --rm backup
+services:
+  registry-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: devhub
+      POSTGRES_PASSWORD: devhub
+      POSTGRES_DB: devhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - registry_data:/var/lib/postgresql/data
+
+  ingest:
+    build: .
+    depends_on:
+      - registry-db
+    env_file:
+      - .env
+    environment:
+      REGISTRY_DATABASE_URL: postgresql://devhub:devhub@registry-db:5432/devhub?sslmode=disable
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    command: ["/app/bin/ingest_server"]
+
+  backup:
+    build: .
+    depends_on:
+      - registry-db
+    env_file:
+      - .env
+    environment:
+      REGISTRY_DATABASE_URL: postgresql://devhub:devhub@registry-db:5432/devhub?sslmode=disable
+    command: ["/app/bin/backup"]
+    profiles: ["manual"]
+
+volumes:
+  registry_data:

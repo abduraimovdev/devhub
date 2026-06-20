@@ -1,0 +1,33 @@
+name: devhub
+description: >-
+  Multi-project DevOps Telegram service. Two jobs sharing one core:
+  (A) real-time log / error / crash / login ingestion, and
+  (B) scheduled Postgres backups — both routed to per-project topics in a
+  Telegram forum group. Reusable across any number of projects.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+# Phase 1 skelet PURE Dart (dart:io/dart:core) — `dart pub get` + `dart analyze`
+# darrov ishlaydi. Tashqi paketlar O'Z bosqichida qo'shiladi (har biri import
+# qilinadigan joyda). Bu — versiya to'qnashuvini Phase 1 dan uzoqlashtiradi.
+#
+# Rejalashtirilgan (qo'shiladigan) paketlar:
+#   Phase 2 (backup):  http              — Telegram send + R2
+#   Phase 3 (registry):postgres          — loyiha registri
+#   Phase 3 (bot):     televerse         — /newproject va buyruqlar
+#   Phase 4 (ingest):  shelf, shelf_router
+# Qo'shganda: `dart pub add http postgres televerse shelf shelf_router`.
+dependencies:
+  crypto: ^3.0.7
+  http: ^1.6.0
+  postgres: ^3.5.12
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  televerse: ^2.4.4
+
+dev_dependencies:
+  lints: ^4.0.0
+  test: ^1.25.0

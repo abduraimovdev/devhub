@@ -1,0 +1,15 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-raw-types: true
+  errors:
+    todo: ignore
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - prefer_final_locals
+    - avoid_print          # logger ishlat, print emas (cron'da stdout mustasno)
+    - unawaited_futures

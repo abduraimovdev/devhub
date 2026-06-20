@@ -1,0 +1,22 @@
+# Windows'da ishlashni muammosiz qilish uchun ENG MUHIM sozlama:
+# barcha matn fayllar repo'da LF (\n) bilan saqlanadi. Bo'lmasa Windows
+# CRLF (\r\n) qo'shadi va Docker ichidagi shell/skript/Dockerfile ishlamay
+# qoladi ("/bin/sh^M: bad interpreter" kabi xatolar).
+* text=auto eol=lf
+
+*.dart   text eol=lf
+*.yaml   text eol=lf
+*.yml    text eol=lf
+*.md     text eol=lf
+*.sh     text eol=lf
+*.env    text eol=lf
+Dockerfile text eol=lf
+.gitignore text eol=lf
+
+# Binary fayllar (eol normalizatsiya qilinmasin)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gz  binary
+*.zip binary
+*.dump binary

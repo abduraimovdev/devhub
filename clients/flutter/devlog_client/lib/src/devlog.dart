@@ -94,14 +94,16 @@ class DevLog {
   }
 
   static void _installCrashHandlers() {
-    final prev = FlutterError.onError;
+    // Mavjud handlerlar (masalan Sentry) BUZILMASIN — zanjirlaymiz.
+    final prevFlutter = FlutterError.onError;
     FlutterError.onError = (details) {
       _crash(details.exception, details.stack);
-      prev?.call(details);
+      prevFlutter?.call(details);
     };
+    final prevPlatform = PlatformDispatcher.instance.onError;
     PlatformDispatcher.instance.onError = (error, stack) {
       _crash(error, stack);
-      return false; // default ishlov ham davom etsin
+      return prevPlatform?.call(error, stack) ?? false;
     };
   }
 }

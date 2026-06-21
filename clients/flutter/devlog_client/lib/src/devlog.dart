@@ -51,11 +51,16 @@ class DevLog {
 
   /// API non-2xx javobi (200/201 e'tiborga olinmaydi). Dio/Serverpod
   /// interceptor'idan yoki qo'lda chaqiriladi (README'ga qarang).
+  ///
+  /// [request] — yuborilgan so'rov tanasi/parametrlari (qisqartirilgan).
+  /// [response] — serverdan kelgan xato javobi (asl xato matni).
   static void apiError({
     required int statusCode,
     String method = '',
     String url = '',
     String? message,
+    String? request,
+    String? response,
     int? durationMs,
   }) {
     if (statusCode == 200 || statusCode == 201) return;
@@ -66,6 +71,8 @@ class DevLog {
         'statusCode': statusCode,
         if (method.isNotEmpty) 'method': method,
         if (url.isNotEmpty) 'url': url,
+        if (request != null && request.isNotEmpty) 'request': request,
+        if (response != null && response.isNotEmpty) 'response': response,
         if (durationMs != null) 'durationMs': durationMs,
       },
     );

@@ -89,11 +89,22 @@ String formatLogMessage(LogEvent e, {int suppressedBefore = 0}) {
   // Vaqt — Toshkent (UTC+5).
   body.write('\n<i>Vaqt:</i> ${_tashkentTime(e.ts)}');
 
+  // So'rov tanasi (API xato) — nima yuborilgani. <pre> blokda, qisqartirilgan.
+  final request = e.context['request'];
+  if (request != null && '$request'.trim().isNotEmpty) {
+    body.write("\n\n<b>So'rov:</b>\n<pre>${_esc(_trimBlock('$request'))}</pre>");
+  }
+  // Javob tanasi (API xato) — serverning ASL xatosi.
+  final response = e.context['response'];
+  if (response != null && '$response'.trim().isNotEmpty) {
+    body.write('\n<b>Javob:</b>\n<pre>${_esc(_trimBlock('$response'))}</pre>');
+  }
+
   // Stack trace (crash/error) — qayerda xato bo'lganini ko'rsatadi.
   // Telegram limiti uchun qisqartiriladi, <pre> blokda.
   final stack = e.context['stack'];
   if (stack != null && '$stack'.trim().isNotEmpty) {
-    body.write('\n\n<b>Stack:</b>\n<pre>${_esc(_trimStack('$stack'))}</pre>');
+    body.write('\n\n<b>Stack:</b>\n<pre>${_esc(_trimBlock('$stack'))}</pre>');
   }
 
   if (suppressedBefore > 0) {
@@ -102,10 +113,10 @@ String formatLogMessage(LogEvent e, {int suppressedBefore = 0}) {
   return body.toString();
 }
 
-/// Stack trace'ni Telegram xabari limiti uchun qisqartiradi — eng yuqori
-/// freym'lar (xato kelib chiqqan joy) saqlanadi.
-String _trimStack(String stack, {int maxLines = 20, int maxChars = 2000}) {
-  var lines = stack.split('\n').where((l) => l.trim().isNotEmpty).toList();
+/// Uzun matnni (stack / so'rov / javob) Telegram xabari limiti uchun
+/// qisqartiradi — eng boshidagi (eng muhim) qatorlar saqlanadi.
+String _trimBlock(String text, {int maxLines = 20, int maxChars = 2000}) {
+  var lines = text.split('\n').where((l) => l.trim().isNotEmpty).toList();
   var truncated = false;
   if (lines.length > maxLines) {
     lines = lines.take(maxLines).toList();

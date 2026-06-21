@@ -7,7 +7,7 @@ class Scrub {
 
   static final RegExp _bearer = RegExp(r'([Bb]earer\s+)[A-Za-z0-9._\-]+');
   static final RegExp _kv = RegExp(
-    r'("?(?:password|passwd|pin|token|secret|api[_-]?key|access[_-]?key|authorization)"?\s*[:=]\s*"?)[^"\s,}]+',
+    r'("?(?:password|passwd|pin|otp|code|phone|token|secret|api[_-]?key|access[_-]?key|authorization)"?\s*[:=]\s*"?)[^"\s,}]+',
     caseSensitive: false,
   );
   static final RegExp _connPw = RegExp(r'(://[^:/\s]+:)[^@/\s]+(@)');

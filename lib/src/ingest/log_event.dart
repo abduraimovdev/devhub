@@ -10,7 +10,8 @@ class LogEvent {
     this.statusCode,
     this.endpoint,
     this.context = const {},
-  });
+    DateTime? ts,
+  }) : ts = ts ?? DateTime.now().toUtc();
 
   final String type; // crash | error | api | freeze | login
   final String? level;
@@ -18,6 +19,7 @@ class LogEvent {
   final int? statusCode; // api uchun
   final String? endpoint; // route / url
   final Map<String, dynamic> context;
+  final DateTime ts; // hodisa vaqti (UTC) — klient yuboradi yoki qabul vaqti
 
   static LogEvent fromJson(Map<String, dynamic> j) {
     final ctx = (j['context'] as Map?)?.cast<String, dynamic>() ?? const {};
@@ -30,6 +32,7 @@ class LogEvent {
       endpoint: (j['endpoint'] ?? ctx['endpoint'] ?? ctx['route'] ?? ctx['url'])
           as String?,
       context: ctx,
+      ts: DateTime.tryParse('${j['ts'] ?? ''}')?.toUtc(),
     );
   }
 }
@@ -52,7 +55,8 @@ String dedupeKey(int projectId, LogEvent e) {
 int? routeTopic(LogEvent e, Project p) =>
     e.type == 'login' ? p.topicLogin : p.topicLog;
 
-/// Telegram HTML xabari — maxfiy ma'lumot scrub qilinadi.
+/// Telegram HTML xabari — maxfiy ma'lumot scrub qilinadi. To'liq log:
+/// ilova, versiya, qurilma, qadam, sabab, telefon, vaqt (Toshkent).
 String formatLogMessage(LogEvent e, {int suppressedBefore = 0}) {
   final head = StringBuffer('${_emoji(e)} <b>${_esc(e.type.toUpperCase())}</b>');
   if (e.statusCode != null) head.write(' ${e.statusCode}');
@@ -60,20 +64,67 @@ String formatLogMessage(LogEvent e, {int suppressedBefore = 0}) {
     head.write(' <code>${_esc(e.endpoint!)}</code>');
   }
   final body = StringBuffer('$head\n${_esc(Scrub.text(e.message))}');
-  for (final k in const [
-    'method',
-    'durationMs',
-    'appVersion',
-    'device',
-    'userId',
-  ]) {
-    final v = e.context[k];
-    if (v != null) body.write('\n<i>$k</i>: ${_esc(Scrub.text('$v'))}');
+
+  // Kontekst qatorlari — tartibli, faqat mavjud bo'lganlari (kalit → yorliq).
+  const labels = <List<String>>[
+    ['app', 'Ilova'],
+    ['appVersion', 'Versiya'],
+    ['device', 'Qurilma'],
+    ['osVersion', 'OS'],
+    ['step', 'Qadam'],
+    ['reason', 'Sabab'],
+    ['phone', 'Telefon'],
+    ['userId', 'User'],
+    ['method', 'Metod'],
+  ];
+  for (final l in labels) {
+    final v = e.context[l[0]];
+    if (v != null && '$v'.isNotEmpty) {
+      body.write('\n<i>${l[1]}:</i> ${_esc(Scrub.text('$v'))}');
+    }
   }
+  final dur = e.context['durationMs'];
+  if (dur != null) body.write('\n<i>Davomiyligi:</i> $dur ms');
+
+  // Vaqt — Toshkent (UTC+5).
+  body.write('\n<i>Vaqt:</i> ${_tashkentTime(e.ts)}');
+
+  // Stack trace (crash/error) — qayerda xato bo'lganini ko'rsatadi.
+  // Telegram limiti uchun qisqartiriladi, <pre> blokda.
+  final stack = e.context['stack'];
+  if (stack != null && '$stack'.trim().isNotEmpty) {
+    body.write('\n\n<b>Stack:</b>\n<pre>${_esc(_trimStack('$stack'))}</pre>');
+  }
+
   if (suppressedBefore > 0) {
     body.write('\n<i>(oldingi oynada yana ×$suppressedBefore bostirildi)</i>');
   }
   return body.toString();
+}
+
+/// Stack trace'ni Telegram xabari limiti uchun qisqartiradi — eng yuqori
+/// freym'lar (xato kelib chiqqan joy) saqlanadi.
+String _trimStack(String stack, {int maxLines = 20, int maxChars = 2000}) {
+  var lines = stack.split('\n').where((l) => l.trim().isNotEmpty).toList();
+  var truncated = false;
+  if (lines.length > maxLines) {
+    lines = lines.take(maxLines).toList();
+    truncated = true;
+  }
+  var out = lines.join('\n');
+  if (out.length > maxChars) {
+    out = out.substring(0, maxChars);
+    truncated = true;
+  }
+  return truncated ? '$out\n… (qisqartirildi)' : out;
+}
+
+/// UTC vaqtni Toshkent (UTC+5) ga o'girib `YYYY-MM-DD HH:MM:SS` formatlaydi.
+String _tashkentTime(DateTime utc) {
+  final t = utc.add(const Duration(hours: 5));
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${t.year}-${two(t.month)}-${two(t.day)} '
+      '${two(t.hour)}:${two(t.minute)}:${two(t.second)}';
 }
 
 String _emoji(LogEvent e) {

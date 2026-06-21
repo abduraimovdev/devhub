@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:devlog_client/src/device_info.dart';
 import 'package:devlog_client/src/log_event.dart';
 import 'package:devlog_client/src/scrub.dart';
 import 'package:devlog_client/src/sender.dart';
@@ -7,7 +10,7 @@ import 'package:flutter/foundation.dart';
 ///
 /// ```dart
 /// void main() {
-///   DevLog.init(baseUrl: '...', apiKey: '...', appVersion: '1.0.0+4');
+///   DevLog.init(app: 'POS', apiKey: '...', appVersion: '1.0.0+4');
 ///   runZonedGuarded(() => runApp(const App()), DevLog.zoneError);
 /// }
 /// ```
@@ -15,17 +18,31 @@ class DevLog {
   DevLog._();
 
   static DevLogSender? _sender;
+  static String? _app;
   static String? _appVersion;
+  static String? _device;
 
   static void init({
     required String baseUrl,
     required String apiKey,
+    String? app,
     String? appVersion,
     bool captureCrashes = true,
   }) {
+    _app = app;
     _appVersion = appVersion;
     _sender = DevLogSender(baseUrl: baseUrl, apiKey: apiKey);
+    // Qurilma modelini fonда aniqlaymiz — keyingi loglarга `device` qo'shiladi.
+    unawaited(_detectDevice());
     if (captureCrashes) _installCrashHandlers();
+  }
+
+  static Future<void> _detectDevice() async {
+    try {
+      _device = await resolveDeviceLabel();
+    } on Object {
+      // device aniqlanmasa ham log ishlayveradi — jim.
+    }
   }
 
   /// Umumiy xato.
@@ -55,14 +72,21 @@ class DevLog {
   }
 
   /// Login natijasi yoki urinishi (telefon avtomatik maskalanadi).
+  ///
+  /// [step] — qaysi bosqich: `telefon` | `OTP` | `PIN` | `parol`.
+  /// [reason] — muvaffaqiyatsizlik sababi (xato matni).
   static void login({
     required bool success,
     String? phone,
+    String? step,
+    String? reason,
     Map<String, dynamic>? context,
   }) {
     _enqueue('login', success ? 'login ✅' : 'login urinishi ❌', {
       if (phone != null) 'phone': maskPhone(phone),
       'success': success,
+      if (step != null) 'step': step,
+      if (reason != null) 'reason': reason,
       ...?context,
     });
   }
@@ -90,7 +114,9 @@ class DevLog {
         type: type,
         message: message,
         context: {
+          if (_app != null) 'app': _app,
           if (_appVersion != null) 'appVersion': _appVersion,
+          if (_device != null) 'device': _device,
           ...?context,
         },
       ),

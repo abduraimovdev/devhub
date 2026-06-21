@@ -3,6 +3,10 @@
 build/
 .packages
 
+# Flutter (generatsiya — devlog_client sub-paketi)
+.flutter-plugins
+.flutter-plugins-dependencies
+
 # Secrets / config
 .env
 .env.local

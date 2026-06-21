@@ -28,7 +28,7 @@ devhub/
 │   ├── core/        # umumiy yadro: config, telegram, registry, scrub
 │   ├── backup/      # Vazifa B
 │   └── ingest/      # Vazifa A
-├── Dockerfile       # AOT exe → postgres:17 (pg_dump bilan)
+├── Dockerfile       # AOT exe → postgres:18 (pg_dump bilan)
 ├── docker-compose.yaml
 └── CLAUDE.md
 ```

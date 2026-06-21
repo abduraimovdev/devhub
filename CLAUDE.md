@@ -36,7 +36,7 @@ Barcha dizayn qarorlari `docs/` ichidagi raqamli fayllarda. Kod va hujjat ziddiy
 - **Backup jadval:** cron `0 0,17 * * *` (UTC) = 05:00 va 22:00 Toshkent.
 - **Backup fayl yuborish (zanjirli fallback):** `sendDocument` (topic) → bo'lmasa **R2 + link** → u ham xato bersa **❌ xato xabari**.
 - **Sentry:** iste'molchi ilovalarda Sentry SAQLANADI (chuqur saqlash); devhub — Telegram real-time qatlami. Biri ikkinchisini almashtirmaydi.
-- **Image:** Dart AOT exe (`dart compile exe`) glibc talab qiladi → runtime base **`postgres:17`** (Debian, `-alpine` EMAS — musl mos kelmaydi). Sabab: docs/06.
+- **Image:** Dart AOT exe (`dart compile exe`) glibc talab qiladi → runtime base **`postgres:18`** (Debian, `-alpine` EMAS — musl mos kelmaydi). Sabab: docs/06. **Major versiya Railway Postgres serveridan kichik bo'lmasin** — `pg_dump` o'zidan yangi serverni dump qila olmaydi (Railway 18.x → tag `18`; server 19'ga o'tsa tag ham 19).
 
 ## Maxfiylik / xavfsizlik
 

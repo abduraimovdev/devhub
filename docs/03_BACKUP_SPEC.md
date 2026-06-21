@@ -35,7 +35,7 @@ Railway'dagi barcha Postgres DB'larni avtomatik backup qilib Telegram'ga (yoki R
 ## Texnik ehtiyot nuqtalari
 
 - **Public connection string SHART.** Railway ichki `*.railway.internal` faqat o'sha proyekt ichida; devhub alohida proyekt → har DB ning **public** URL'i kerak.
-- **pg_dump versiyasi ≥ server versiyasi.** Image `postgres:17` (v17 client PG 13–17 server'larni dump qiladi). DB PG18+ bo'lsa image tag oshiriladi. (Nega `-alpine` emas — docs/06.)
+- **pg_dump major versiyasi ≥ server major versiyasi.** Image `postgres:18` (v18 client PG ≤18 server'larni dump qiladi). Railway serveri 18.x bo'lgani uchun 18 — DB PG19+ bo'lsa image tag oshiriladi. (Nega `-alpine` emas — docs/06.)
 - Image tarkibi: `pg_dump` (postgres image), `curl` (apt), `gzip` (Debian).
 
 ## Yaxshilanishlar (kelishilgan)

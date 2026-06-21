@@ -11,9 +11,12 @@ RUN dart compile exe bin/ingest_server.dart -o /app/bin/ingest_server
 RUN dart compile exe bin/backup.dart        -o /app/bin/backup
 
 # ─── 2-bosqich: runtime (pg_dump bilan) ───
-# postgres:17 — Debian (glibc) → AOT binary mos. `pg_dump` shu image'da bor.
+# postgres:18 — Debian (glibc) → AOT binary mos. `pg_dump` shu image'da bor.
+# MUHIM: image major versiyasi Railway Postgres serveridan KICHIK bo'lmasin —
+# pg_dump o'zidan YANGI serverni dump qila olmaydi (server_version mismatch).
+# Railway serveri 18.x bo'lgani uchun 18. Railway 19'ga ko'tarilsa — bu ham 19.
 # `-alpine` EMAS: musl glibc binary'ni ishlatolmaydi (docs/06).
-FROM postgres:17
+FROM postgres:18
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl ca-certificates gzip \

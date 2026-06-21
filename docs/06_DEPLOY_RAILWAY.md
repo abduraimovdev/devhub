@@ -11,9 +11,11 @@ Bitta GitHub repo, bitta Docker image. Railway'da uchta narsa:
    - **Cron Schedule:** `0 0,17 * * *` (UTC = 05:00 / 22:00 Toshkent)
    - Doimiy ishlamaydi — Railway uni jadval bo'yicha ishga tushiradi, ish tugagach o'chadi.
 
-## Image — nega `postgres:17` (`-alpine` EMAS)
+## Image — nega `postgres:18` (`-alpine` EMAS)
 
-`dart compile exe` **glibc** uchun native binary chiqaradi (rasmiy Dart image Debian). `postgres:17-alpine` esa **musl** (Alpine) — binary mos kelmaydi, ishlamaydi. Shuning uchun runtime base **`postgres:17`** (Debian, glibc) — `pg_dump` ham shu image'da bor. Biroz kattaroq, lekin to'g'ri ishlaydi.
+`dart compile exe` **glibc** uchun native binary chiqaradi (rasmiy Dart image Debian). `postgres:18-alpine` esa **musl** (Alpine) — binary mos kelmaydi, ishlamaydi. Shuning uchun runtime base **`postgres:18`** (Debian, glibc) — `pg_dump` ham shu image'da bor. Biroz kattaroq, lekin to'g'ri ishlaydi.
+
+> **Major versiya = Railway Postgres serveri major versiyasi (yoki kattaroq).** `pg_dump` o'zidan YANGI major serverni dump qila olmaydi (`server version mismatch` xatosi). Railway serverlari hozir **18.x** → image `postgres:18`. Railway 19'ga ko'tarilsa, bu tag ham 19 ga oshiriladi.
 
 (Muqobil: `-alpine` kerak bo'lsa, Dart kodni Alpine/musl image'da AOT qilish kerak — murakkabroq. Hozircha kerak emas.)
 

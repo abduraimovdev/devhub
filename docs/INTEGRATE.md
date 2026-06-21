@@ -183,6 +183,15 @@ topic'ga tushadi (50MB'dan oshsa R2 link).
 > Railway DB bo'lsa — **public** (`Connect → Public Network`) manzil kerak,
 > ichki `*.railway.internal` emas.
 
+**Jadvalni kutmasdan, qo'lda backup so'rash** — istalgan vaqtda:
+
+```
+/getbackup qrio
+```
+
+Darhol `pg_dump` qilib **Qrio · Backup** topic'iga tashlaydi (avtomatik
+jadval bilan bir xil mexanizm, faqat qo'lda triggerlanadi).
+
 ---
 
 ## 5. Tekshirish
@@ -252,6 +261,7 @@ curl -X POST "$DEVLOG_URL/v1/log" \
 ```
 /newproject <Nom>                 → API key + 3 topic
 /addbackup <slug> <public_db_url> → backup ro'yxatiga
+/getbackup <slug>                 → darhol backup (qo'lda)
 DevLog.init(baseUrl, apiKey)      → crash avtomatik
 DevLog.apiError / login / error   → qo'lda
 POST /v1/log  (X-Api-Key)         → istalgan til

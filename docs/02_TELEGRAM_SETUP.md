@@ -41,6 +41,7 @@ Bot quyidagini bajaradi:
 |---|---|
 | `/newproject <label>` | 3 topic ochadi + API key + registr yozuvi |
 | `/addbackup <label> <db_url>` | loyihaga backup DB qo'shadi |
+| `/getbackup <label>` | o'sha loyiha DB(lar)ini **darhol** backup qiladi (qo'lda) |
 | `/projects` | ulangan loyihalar ro'yxati |
 | `/removeproject <label>` | loyihani o'chiradi (topiclar qoladi) |
 | `/rotatekey <label>` | API key'ni yangilaydi |

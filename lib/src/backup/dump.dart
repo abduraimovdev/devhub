@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-/// `pg_dump` natijasi.
 class DumpResult {
   DumpResult.success(this.file, this.bytes)
       : ok = true,
@@ -18,11 +17,6 @@ class DumpResult {
   final String? error;
 }
 
-/// `pg_dump --no-owner --no-privileges <url>` → gzip (dart:io, cross-platform,
-/// `gzip` binary'siz) → `Directory.systemTemp` ichidagi `.sql.gz` fayl.
-///
-/// `gzip`ni Dart kodекс bilan qilamiz — Windows'da ham binary kerak emas.
-/// `pg_dump` esa native (Docker image'da bor; lokal Windows'da Docker orqali).
 Future<DumpResult> dumpDatabase({
   required String name,
   required String dbUrl,
@@ -30,8 +24,7 @@ Future<DumpResult> dumpDatabase({
   DateTime? now,
 }) async {
   final ts = (now ?? DateTime.now()).toUtc();
-  final outPath =
-      '${Directory.systemTemp.path}${Platform.pathSeparator}'
+  final outPath = '${Directory.systemTemp.path}${Platform.pathSeparator}'
       '${backupFileName(name, ts)}';
   final outFile = File(outPath);
 
@@ -68,7 +61,6 @@ Future<DumpResult> dumpDatabase({
 
     final bytes = await outFile.length();
     if (bytes < 1024) {
-      // Juda kichik — ehtimol bo'sh/buzilgan dump.
       return DumpResult.failure(
         'dump juda kichik ($bytes bayt) — ehtimol bo\'sh DB yoki xato',
       );
@@ -84,12 +76,9 @@ Future<DumpResult> dumpDatabase({
 Future<void> _safeDelete(File f) async {
   try {
     if (f.existsSync()) await f.delete();
-  } on Object {
-    // jim — tozalash best-effort
-  }
+  } on Object {}
 }
 
-/// `label_YYYY-MM-DD_HH-MM.sql.gz` (UTC). Sof — test qilinadi.
 String backupFileName(String name, DateTime utc) {
   String two(int n) => n.toString().padLeft(2, '0');
   final d = utc;
@@ -97,12 +86,10 @@ String backupFileName(String name, DateTime utc) {
       '_${two(d.hour)}-${two(d.minute)}.sql.gz';
 }
 
-/// Telegram caption. Sof — test qilinadi.
 String backupCaption(String name, DateTime utc, int bytes) {
   return '✅ <b>$name</b>\n🕒 ${utc.toIso8601String()}\n📦 ${humanSize(bytes)}';
 }
 
-/// Baytni odam o'qiydigan ko'rinishga. Sof — test qilinadi.
 String humanSize(int bytes) {
   if (bytes < 1024) return '$bytes B';
   const units = ['KB', 'MB', 'GB', 'TB'];
@@ -115,7 +102,6 @@ String humanSize(int bytes) {
   return '${size.toStringAsFixed(1)} ${units[i]}';
 }
 
-/// Matnning oxirgi [n] qatori (pg_dump xatosini qisqartirib yuborish uchun).
 String tailLines(String text, [int n = 6]) {
   final lines =
       text.trim().split('\n').where((l) => l.trim().isNotEmpty).toList();

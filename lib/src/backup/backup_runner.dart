@@ -6,8 +6,6 @@ import 'package:devhub/src/core/config.dart';
 import 'package:devhub/src/core/registry.dart';
 import 'package:devhub/src/core/telegram.dart';
 
-/// Vazifa B orkestratori: har DB ni dump → yuborish zanjiri → tozalash →
-/// xulosa. Har nishon izolyatsiya — bittasi yiqilsa qolgani davom etadi.
 class BackupRunner {
   BackupRunner({required this.config, required this.telegram, this.r2});
 
@@ -60,12 +58,11 @@ class BackupRunner {
     final tooBig = res.bytes > config.maxTelegramMb * 1024 * 1024;
 
     try {
-      // 1) Telegram (≤ maxTelegramMb bo'lsa)
       if (!tooBig) {
         final sent = await telegram.sendDocument(topic, file, caption: caption);
         if (sent) return true;
       }
-      // 2) R2 fallback (katta yoki Telegram yuborolmadi)
+
       if (r2 != null) {
         try {
           final key = 'backups/${t.name}/${file.uri.pathSegments.last}';
@@ -83,7 +80,7 @@ class BackupRunner {
           return false;
         }
       }
-      // 3) R2 sozlanmagan
+
       await _safeSend(
         topic,
         '❌ <b>${t.name}</b> yuborilmadi (${humanSize(res.bytes)} — '
@@ -106,9 +103,7 @@ class BackupRunner {
   Future<void> _safeDelete(File f) async {
     try {
       if (f.existsSync()) await f.delete();
-    } on Object {
-      // best-effort
-    }
+    } on Object {}
   }
 
   static String _esc(String s) => s
@@ -116,8 +111,6 @@ class BackupRunner {
       .replaceAll('<', '&lt;')
       .replaceAll('>', '&gt;');
 
-  /// Phase 2 bootstrap: `DATABASES` env → nishonlar (har qatorda `label=url`).
-  /// Phase 3 da registr (Postgres) bu manbani almashtiradi. Sof — test qilinadi.
   static List<BackupTarget> targetsFromEnv(
     String? databases, {
     int? backupTopicId,

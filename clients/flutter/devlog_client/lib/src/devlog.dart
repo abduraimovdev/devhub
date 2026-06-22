@@ -6,14 +6,6 @@ import 'package:devlog_client/src/scrub.dart';
 import 'package:devlog_client/src/sender.dart';
 import 'package:flutter/foundation.dart';
 
-/// devhub log klienti — fasad. App startup'da `DevLog.init(...)` chaqiriladi.
-///
-/// ```dart
-/// void main() {
-///   DevLog.init(app: 'POS', apiKey: '...', appVersion: '1.0.0+4');
-///   runZonedGuarded(() => runApp(const App()), DevLog.zoneError);
-/// }
-/// ```
 class DevLog {
   DevLog._();
 
@@ -32,7 +24,7 @@ class DevLog {
     _app = app;
     _appVersion = appVersion;
     _sender = DevLogSender(baseUrl: baseUrl, apiKey: apiKey);
-    // Qurilma modelini fonда aniqlaymiz — keyingi loglarга `device` qo'shiladi.
+
     unawaited(_detectDevice());
     if (captureCrashes) _installCrashHandlers();
   }
@@ -40,20 +32,12 @@ class DevLog {
   static Future<void> _detectDevice() async {
     try {
       _device = await resolveDeviceLabel();
-    } on Object {
-      // device aniqlanmasa ham log ishlayveradi — jim.
-    }
+    } on Object {}
   }
 
-  /// Umumiy xato.
   static void error(String message, {Map<String, dynamic>? context}) =>
       _enqueue('error', message, context);
 
-  /// API non-2xx javobi (200/201 e'tiborga olinmaydi). Dio/Serverpod
-  /// interceptor'idan yoki qo'lda chaqiriladi (README'ga qarang).
-  ///
-  /// [request] — yuborilgan so'rov tanasi/parametrlari (qisqartirilgan).
-  /// [response] — serverdan kelgan xato javobi (asl xato matni).
   static void apiError({
     required int statusCode,
     String method = '',
@@ -78,10 +62,6 @@ class DevLog {
     );
   }
 
-  /// Login natijasi yoki urinishi (telefon avtomatik maskalanadi).
-  ///
-  /// [step] — qaysi bosqich: `telefon` | `OTP` | `PIN` | `parol`.
-  /// [reason] — muvaffaqiyatsizlik sababi (xato matni).
   static void login({
     required bool success,
     String? phone,
@@ -98,13 +78,10 @@ class DevLog {
     });
   }
 
-  /// UI qotishi (freeze) — watchdog/kadr-vaqti hisoblagichidan.
   static void freeze(int frameMs) =>
       _enqueue('freeze', 'UI qotdi: ${frameMs}ms', {'frameMs': frameMs});
 
-  /// `runZonedGuarded` uchun xato handleri.
-  static void zoneError(Object error, StackTrace stack) =>
-      _crash(error, stack);
+  static void zoneError(Object error, StackTrace stack) => _crash(error, stack);
 
   static void _crash(Object error, StackTrace? stack) =>
       _enqueue('crash', error.toString(), {'stack': stack?.toString()});
@@ -115,7 +92,7 @@ class DevLog {
     Map<String, dynamic>? context,
   ) {
     final s = _sender;
-    if (s == null) return; // init qilinmagan — jim
+    if (s == null) return;
     s.enqueue(
       DevLogEvent(
         type: type,
@@ -131,7 +108,6 @@ class DevLog {
   }
 
   static void _installCrashHandlers() {
-    // Mavjud handlerlar (masalan Sentry) BUZILMASIN — zanjirlaymiz.
     final prevFlutter = FlutterError.onError;
     FlutterError.onError = (details) {
       _crash(details.exception, details.stack);

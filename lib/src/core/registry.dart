@@ -3,8 +3,6 @@ import 'dart:math';
 
 import 'package:postgres/postgres.dart';
 
-// Loyiha registri (Postgres). Sxema: docs/05_REGISTRY_SCHEMA.md.
-
 class Project {
   Project({
     required this.id,
@@ -34,7 +32,7 @@ class BackupTarget {
   });
 
   final String name;
-  final String dbUrl; // public connection string (SIR — scrub/encrypt)
+  final String dbUrl;
   final int? topicBackup;
   final String projectLabel;
 }
@@ -54,8 +52,6 @@ abstract class Registry {
   Future<List<Project>> allProjects();
 }
 
-/// Postgres-backed registr. URL'da `?sslmode=` bo'lmasa default `require`
-/// (Railway uchun OK; lokal docker uchun `?sslmode=disable` qo'shing).
 class PgRegistry implements Registry {
   PgRegistry(this._url);
 
@@ -68,7 +64,6 @@ class PgRegistry implements Registry {
     return _conn = await Connection.openFromUrl(_url);
   }
 
-  /// Jadvallarni yaratadi (idempotent) — startup'da chaqiriladi.
   Future<void> bootstrap() async {
     final c = await _c();
     await c.execute('''
@@ -159,7 +154,8 @@ class PgRegistry implements Registry {
   Future<void> addBackupTarget(String label, String name, String dbUrl) async {
     final c = await _c();
     final p = await c.execute(
-      Sql.named('SELECT id FROM projects WHERE slug = @l OR label = @l LIMIT 1'),
+      Sql.named(
+          'SELECT id FROM projects WHERE slug = @l OR label = @l LIMIT 1'),
       parameters: {'l': label},
     );
     if (p.isEmpty) throw StateError('Loyiha topilmadi: $label');
@@ -199,7 +195,6 @@ class PgRegistry implements Registry {
       );
 }
 
-/// "Dozone POS" → "dozone-pos". Sof — test qilinadi.
 String slugify(String s) {
   final out = s
       .toLowerCase()
@@ -208,7 +203,6 @@ String slugify(String s) {
   return out.isEmpty ? 'project' : out;
 }
 
-/// `dl_<slug>_<random>` API key. Random — format/prefix test qilinadi.
 String generateApiKey(String slug, {Random? random}) {
   final rnd = random ?? Random.secure();
   final bytes = List<int>.generate(24, (_) => rnd.nextInt(256));

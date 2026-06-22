@@ -1,4 +1,3 @@
-/// devhub log ingest klienti.
 library;
 
 export 'src/devlog.dart';

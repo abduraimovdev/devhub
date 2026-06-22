@@ -2,12 +2,6 @@ import 'dart:io';
 
 import 'package:devhub/devhub.dart';
 
-/// Vazifa B — DB backup (CRON: bir marta ishlab-o'chadi).
-///
-/// Nishonlar **registr (Postgres)** dan keladi — `/addbackup` qo'shgan faol
-/// DB'lar (docs/07). Registr bo'sh yoki ulanmasa, `DATABASES` env'ga
-/// qaytadi (Phase 2 bootstrap). Shu tufayli yangi loyiha qo'shish uchun
-/// redeploy SHART EMAS — bot `/addbackup` qiladi, keyingi cron uni oladi.
 Future<void> main() async {
   stdout.writeln('devhub · backup cron (B) — docs/03');
 
@@ -25,7 +19,6 @@ Future<void> main() async {
   );
   final r2 = cfg.r2 == null ? null : R2Uploader(cfg.r2!);
 
-  // 1) Registrdan (Postgres) — `/addbackup` qo'shgan faol nishonlar.
   var targets = <BackupTarget>[];
   PgRegistry? registry;
   if (cfg.registryDatabaseUrl.isNotEmpty) {
@@ -39,7 +32,6 @@ Future<void> main() async {
     }
   }
 
-  // 2) Registr bo'sh/ulanmadi — `DATABASES` env (Phase 2 bootstrap).
   if (targets.isEmpty) {
     targets = BackupRunner.targetsFromEnv(
       cfg.databasesEnv,

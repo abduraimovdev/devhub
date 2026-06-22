@@ -1,6 +1,5 @@
 import 'package:devlog_client/src/scrub.dart';
 
-/// Yuboriladigan log hodisasi.
 class DevLogEvent {
   DevLogEvent({
     required this.type,
@@ -8,12 +7,10 @@ class DevLogEvent {
     this.context = const {},
   });
 
-  /// crash | error | api | freeze | login
   final String type;
   final String message;
   final Map<String, dynamic> context;
 
-  /// Maxfiy ma'lumotni maskalab nusxa qaytaradi.
   DevLogEvent scrubbed() => DevLogEvent(
         type: type,
         message: scrubText(message),

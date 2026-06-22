@@ -4,8 +4,6 @@ import 'dart:convert';
 import 'package:devlog_client/src/log_event.dart';
 import 'package:http/http.dart' as http;
 
-/// Xotira-ichidagi navbat + davriy batch yuborish. UI'ni BLOKLAMAYDI.
-/// Tarmoq yo'q bo'lsa navbatda qoladi va keyingi flush'da qayta urinadi.
 class DevLogSender {
   DevLogSender({
     required this.baseUrl,
@@ -30,7 +28,7 @@ class DevLogSender {
   bool _sending = false;
 
   void enqueue(DevLogEvent e) {
-    if (_queue.length >= maxQueue) _queue.removeAt(0); // eng eskini tashlaymiz
+    if (_queue.length >= maxQueue) _queue.removeAt(0);
     _queue.add(e.scrubbed());
   }
 
@@ -52,11 +50,9 @@ class DevLogSender {
           )
           .timeout(const Duration(seconds: 10));
       if (resp.statusCode >= 200 && resp.statusCode < 300) {
-        _queue.removeRange(0, batch.length); // yuborildi
+        _queue.removeRange(0, batch.length);
       }
-      // 4xx/5xx/timeout → navbatda qoladi, keyingi flush qayta urinadi.
     } on Object {
-      // tarmoq yo'q — navbatda qoladi.
     } finally {
       _sending = false;
     }

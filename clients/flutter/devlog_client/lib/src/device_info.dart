@@ -1,17 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
-/// Inson o'qiydigan qurilma yorlig'i — har log "device" kontekstiga qo'shiladi.
-///
-/// Misollar:
-/// - Android: `samsung SM-S928B (Android 14)`
-/// - Windows: `Windows 11 Pro (KASSA-1)`
-/// - iOS:     `iPhone16,2 (iOS 17.5)`
-/// - macOS:   `MacBookPro18,1 (macOS 14.5)`
-/// - Web:     `chrome · Windows`
-///
-/// Xato bo'lsa (plugin yo'q va h.k.) platforma nomini qaytaradi — hech qachon
-/// throw qilmaydi (log oqimini buzmaslik uchun).
 Future<String> resolveDeviceLabel() async {
   final info = DeviceInfoPlugin();
   try {

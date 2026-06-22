@@ -7,8 +7,6 @@ import 'package:devhub/src/core/registry.dart';
 import 'package:devhub/src/core/telegram.dart';
 import 'package:televerse/televerse.dart';
 
-/// Telegram boti — onboarding buyruqlari. Faqat `LOG_GROUP_CHAT_ID` guruhida
-/// ishlaydi (boshqa chatlarda e'tibor bermaydi). docs/02_TELEGRAM_SETUP.md.
 class DevHubBot {
   DevHubBot({
     required this.config,
@@ -89,8 +87,6 @@ class DevHubBot {
     }
   }
 
-  /// `/getbackup <loyiha>` — o'sha loyiha DB(lar)ini DARHOL backup qilib
-  /// "Backup" topic'iga tashlaydi (jadvalni kutmasdan, qo'lda so'rov bilan).
   Future<void> _onGetBackup(Context ctx) async {
     if (!_inGroup(ctx)) return;
     final args = ctx.args;

@@ -4,11 +4,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:devhub/src/core/config.dart';
 
-/// Cloudflare R2 (S3-mos) ga fayl yuklaydi — AWS Signature V4 (PutObject).
-///
-/// Backup > 50MB yoki Telegram yuborolmaganda ishlatiladi (docs/03 fallback).
-/// Eslatma: bitta PUT — fayl baytlari xotiraga o'qiladi. Juda katta (GB+)
-/// fayllar uchun keyin multipart upload kerak bo'ladi.
 class R2Uploader {
   R2Uploader(this.config);
 
@@ -17,8 +12,6 @@ class R2Uploader {
   static const String _region = 'auto';
   static const String _service = 's3';
 
-  /// Faylni `key` ostida yuklaydi. Muvaffaqiyatli → link (public domen yoki
-  /// `r2://bucket/key`). Xato → exception (chaqiruvchi ❌ xabar yuboradi).
   Future<String> upload(File file, String key, {DateTime? now}) async {
     final bytes = await file.readAsBytes();
     final t = (now ?? DateTime.now()).toUtc();
@@ -29,8 +22,7 @@ class R2Uploader {
     final payloadHash = sha256.convert(bytes).toString();
 
     const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-    final canonicalHeaders =
-        'host:$host\n'
+    final canonicalHeaders = 'host:$host\n'
         'x-amz-content-sha256:$payloadHash\n'
         'x-amz-date:$amzDate\n';
     final canonicalRequest = [
@@ -87,8 +79,6 @@ class R2Uploader {
     return 'r2://${config.bucket}/$key';
   }
 
-  /// AWS SigV4 imzo kaliti (HMAC zanjiri). `@visibleForTesting` —
-  /// AWS rasmiy test-vektoriga tekshiriladi.
   static List<int> signingKey(
     String secret,
     String dateStamp,
@@ -99,12 +89,10 @@ class R2Uploader {
         .convert(utf8.encode(dateStamp))
         .bytes;
     final kRegion = Hmac(sha256, kDate).convert(utf8.encode(region)).bytes;
-    final kService =
-        Hmac(sha256, kRegion).convert(utf8.encode(service)).bytes;
+    final kService = Hmac(sha256, kRegion).convert(utf8.encode(service)).bytes;
     return Hmac(sha256, kService).convert(utf8.encode('aws4_request')).bytes;
   }
 
-  /// `YYYYMMDDTHHMMSSZ` (UTC) — SigV4 x-amz-date.
   static String amzTimestamp(DateTime utc) {
     String two(int n) => n.toString().padLeft(2, '0');
     final d = utc;

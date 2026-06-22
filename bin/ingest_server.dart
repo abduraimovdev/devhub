@@ -6,8 +6,6 @@ import 'package:devhub/src/ingest/bot.dart';
 import 'package:devhub/src/ingest/server.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
-/// Vazifa A — log ingest web + onboarding bot (DOIMIY ishlaydi).
-/// `POST /v1/log` (server) va `/newproject` (bot) bir vaqtda ishlaydi.
 Future<void> main() async {
   stdout.writeln('devhub · ingest+bot (A) — docs/02, docs/04');
 
@@ -31,7 +29,6 @@ Future<void> main() async {
     chatId: cfg.logGroupChatId,
   );
 
-  // 1) HTTP ingest serveri (serve darrov qaytadi, fonda tinglaydi).
   final ingest = IngestServer(registry: registry, telegram: telegram);
   final server = await shelf_io.serve(
     ingest.handler,
@@ -40,9 +37,6 @@ Future<void> main() async {
   );
   stdout.writeln('ingest: http://${server.address.address}:${server.port}');
 
-  // 2) Ixtiyoriy: backup'ni SHU servis ichida jadvalga solish — alohida cron
-  //    servis SHART EMAS. `BACKUP_CRON_HOURS_UTC` (masalan "0,17" = 05:00/22:00
-  //    Toshkent) bo'sh bo'lsa o'chiq. Image'da pg_dump bor (postgres:17).
   final backupHours = (Platform.environment['BACKUP_CRON_HOURS_UTC'] ?? '')
       .split(',')
       .map((s) => int.tryParse(s.trim()))
@@ -67,8 +61,6 @@ Future<void> main() async {
     ).start();
   }
 
-  // 3) Telegram bot (long-polling — bloklaydi; server+scheduler event-loop'da
-  //    davom etadi).
   final bot = DevHubBot(config: cfg, registry: registry, telegram: telegram);
   await bot.start();
 }

@@ -1,4 +1,3 @@
-/// devhub — public API.
 library;
 
 export 'src/backup/backup_runner.dart';

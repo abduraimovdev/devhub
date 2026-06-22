@@ -1,10 +1,3 @@
-/// Smart anti-flood filtr (docs/04). Vaqt-oynali dedupe:
-/// - `alwaysSend` (crash/freeze/login/5xx) — har doim yuboriladi.
-/// - boshqalar (4xx/error) — oyna ichida birinchisi yuboriladi, qolgani
-///   bostiriladi va sanaladi; keyingi oynaning birinchisida "×N" bilan chiqadi.
-///
-/// Bir-instansli xotira backstop (MVP). Miqyosda Redis/Postgres bilan
-/// almashtiriladi.
 class LogFilter {
   LogFilter({this.window = const Duration(seconds: 60)});
 
@@ -28,7 +21,6 @@ class LogFilter {
     return const FilterDecision(send: false);
   }
 
-  /// Eski bucketlarni tozalash (xotira o'smasin) — vaqti-vaqti chaqiriladi.
   void sweep([DateTime? now]) {
     final t = now ?? DateTime.now();
     _buckets.removeWhere((_, b) => t.isAfter(b.windowEnd.add(window)));

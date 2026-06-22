@@ -32,7 +32,7 @@ void main() {
       final s = e.scrubbed();
       expect(s.message, isNot(contains('abc123')));
       expect(s.context['auth'], isNot(contains('xyz')));
-      expect(s.context['count'], 5); // string emas — tegilmaydi
+      expect(s.context['count'], 5);
     });
   });
 }

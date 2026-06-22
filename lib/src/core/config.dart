@@ -1,7 +1,5 @@
 import 'dart:io';
 
-/// Env'dan o'qiladigan umumiy konfiguratsiya (fail-fast: majburiy qiymat
-/// yo'q bo'lsa aniq xato).
 class Config {
   Config({
     required this.botToken,
@@ -17,19 +15,14 @@ class Config {
 
   final String botToken;
   final int logGroupChatId;
-  final String registryDatabaseUrl; // bo'sh bo'lishi mumkin (Phase 2 env-mode)
+  final String registryDatabaseUrl;
   final int port;
 
-  // ── Backup (Vazifa B) ──
   final int maxTelegramMb;
   final Duration pgDumpTimeout;
 
-  /// Phase 2 bootstrap: registr (Postgres) hali yo'q bo'lsa, backuplar shu
-  /// topicga tushadi (yoki guruhga, bo'sh bo'lsa). Phase 3 da har loyihaning
-  /// `Backup` topic'i registrdan keladi.
   final int? backupTopicId;
 
-  /// Phase 2 bootstrap: `DATABASES` env — har qatorda `label=url`.
   final String? databasesEnv;
 
   final R2Config? r2;
@@ -60,7 +53,6 @@ class Config {
   }
 }
 
-/// Cloudflare R2 (S3-mos) — backup > 50MB yoki Telegram yuborolmaganda.
 class R2Config {
   R2Config({
     required this.accountId,
@@ -78,7 +70,6 @@ class R2Config {
 
   String get host => '$accountId.r2.cloudflarestorage.com';
 
-  /// Barcha R2_* qiymatlar bo'lsa qaytaradi, aks holda `null` (R2 sozlanmagan).
   static R2Config? fromEnv(Map<String, String> e) {
     final acc = e['R2_ACCOUNT_ID'];
     final ak = e['R2_ACCESS_KEY_ID'];

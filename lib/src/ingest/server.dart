@@ -9,9 +9,6 @@ import 'package:devhub/src/ingest/log_event.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
-/// Log ingest HTTP servisi (Vazifa A). `POST /v1/log`, `/v1/log/batch`,
-/// `GET /health`. API key bo'yicha loyihaga marshrutlaydi, filtr + scrub
-/// qo'llaydi, Telegram topic'ga yuboradi (fire-and-forget → 202).
 class IngestServer {
   IngestServer({
     required this.registry,
@@ -37,7 +34,7 @@ class IngestServer {
       ..get('/health', (Request r) => Response.ok('ok'))
       ..post('/v1/log', _log)
       ..post('/v1/log/batch', _batch);
-    // CORS — admin (Flutter Web) brauzeridan cross-origin POST uchun.
+
     Middleware corsMw() => (inner) => (req) async {
           if (req.method == 'OPTIONS') {
             return Response.ok('', headers: _cors);
@@ -95,11 +92,11 @@ class IngestServer {
     if (!decision.send) return;
     final text =
         formatLogMessage(e, suppressedBefore: decision.suppressedBefore);
-    // Fire-and-forget — klient kutmaydi (202 darrov qaytadi).
+
     unawaited(
       telegram.sendMessage(routeTopic(e, project), text).catchError(
-        (Object err) => stdout.writeln('ingest send xato: $err'),
-      ),
+            (Object err) => stdout.writeln('ingest send xato: $err'),
+          ),
     );
   }
 }

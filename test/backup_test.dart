@@ -63,8 +63,7 @@ noto'g'ri-qator
         'us-east-1',
         'iam',
       );
-      final hex =
-          key.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+      final hex = key.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
       expect(
         hex,
         'f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d',

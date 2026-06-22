@@ -1,7 +1,3 @@
-/// Maxfiy ma'lumotni Telegram'ga yuborishdan OLDIN maskalaydi.
-///
-/// Loglar (xato matni, context JSON) ichidagi token/parol/connection-string
-/// va shu kabilarni `***` bilan almashtiradi. Sof funksiya — test qilinadi.
 class Scrub {
   Scrub._();
 
@@ -12,7 +8,6 @@ class Scrub {
   );
   static final RegExp _connPw = RegExp(r'(://[^:/\s]+:)[^@/\s]+(@)');
 
-  /// Matndagi sirlarni `***` bilan almashtiradi.
   static String text(String input) {
     var out = input;
     out = out.replaceAllMapped(_bearer, (m) => '${m.group(1)}***');
@@ -21,7 +16,6 @@ class Scrub {
     return out;
   }
 
-  /// Telefonni qisman yashiradi: `+998901234567` → `+99890***4567`.
   static String phone(String p) {
     if (p.length < 8) return p;
     return '${p.substring(0, p.length - 7)}***${p.substring(p.length - 4)}';

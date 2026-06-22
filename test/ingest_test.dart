@@ -75,7 +75,9 @@ void main() {
       final t0 = DateTime(2026);
       expect(f.decide('k', alwaysSend: true, now: t0).send, isTrue);
       expect(
-        f.decide('k', alwaysSend: true, now: t0.add(const Duration(seconds: 1)))
+        f
+            .decide('k',
+                alwaysSend: true, now: t0.add(const Duration(seconds: 1)))
             .send,
         isTrue,
       );
@@ -86,7 +88,9 @@ void main() {
       final t0 = DateTime(2026);
       expect(f.decide('k', alwaysSend: false, now: t0).send, isTrue);
       expect(
-        f.decide('k', alwaysSend: false, now: t0.add(const Duration(seconds: 5)))
+        f
+            .decide('k',
+                alwaysSend: false, now: t0.add(const Duration(seconds: 5)))
             .send,
         isFalse,
       );

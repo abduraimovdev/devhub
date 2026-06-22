@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-/// Telegram Bot API ustidan yupqa qatlam (umumiy yadro — A va B ishlatadi).
 class TelegramClient {
   TelegramClient({
     required this.botToken,
@@ -17,8 +16,6 @@ class TelegramClient {
 
   String get _base => 'https://api.telegram.org/bot$botToken';
 
-  /// Topic'ga (message_thread_id) matn yuborish. `threadId` null bo'lsa —
-  /// umumiy guruhga. HTML parse_mode.
   Future<void> sendMessage(int? threadId, String text) async {
     final resp = await _client.post(
       Uri.parse('$_base/sendMessage'),
@@ -36,8 +33,6 @@ class TelegramClient {
     }
   }
 
-  /// Topic'ga fayl yuborish. Muvaffaqiyatli → `true`. Xato (>50MB, tarmoq,
-  /// 4xx/5xx) → `false` — chaqiruvchi R2 fallback'ga o'tadi (docs/03).
   Future<bool> sendDocument(
     int? threadId,
     File file, {
@@ -60,7 +55,6 @@ class TelegramClient {
     }
   }
 
-  /// Forum topic ochadi, `message_thread_id` qaytaradi (`/newproject`).
   Future<int> createForumTopic(String name) async {
     final resp = await _client.post(
       Uri.parse('$_base/createForumTopic'),
@@ -68,9 +62,7 @@ class TelegramClient {
       body: jsonEncode({'chat_id': chatId, 'name': name}),
     );
     final body = jsonDecode(resp.body);
-    if (resp.statusCode != 200 ||
-        body is! Map ||
-        body['ok'] != true) {
+    if (resp.statusCode != 200 || body is! Map || body['ok'] != true) {
       throw TelegramException('createForumTopic: ${resp.body}');
     }
     return (body['result'] as Map)['message_thread_id'] as int;

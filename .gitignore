@@ -7,9 +7,23 @@ build/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# Secrets / config
+# Secrets / config — barcha .env* ignored, FAQAT namuna ochiq qoladi.
+# Sirlar (token, parol, DB URL, R2 kalit) HECH QACHON repo'ga tushmaydi —
+# ular Railway Variables yoki lokal `.env` orqali beriladi (.env.example ga qarang).
 .env
-.env.local
+.env.*
+!.env.example
+# Kalit / sertifikat / hisob ma'lumotlari (xavfsizlik — public repo)
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+passwords*.yaml
+secrets*.yaml
+*credentials*.json
+service-account*.json
 
 # Backup artefaktlari (hech qachon repo'ga tushmasin)
 *.sql

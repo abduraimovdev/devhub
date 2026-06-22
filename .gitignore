@@ -46,3 +46,9 @@ desktop.ini
 
 # pubspec.lock — bu APPLICATION (paket emas), shuning uchun lock'ni
 # COMMIT qilamiz (ignore qilinmaydi).
+
+# Hujjatlar — FAQAT lokal. Public GitHub'ga faqat KOD ketadi; README/CLAUDE/
+# docs/tasks kabi .md hujjatlar yuklanmaydi (lokal ishlash uchun saqlanadi).
+*.md
+docs/
+tasks/

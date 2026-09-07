@@ -67,6 +67,12 @@ String formatLogMessage(LogEvent e, {int suppressedBefore = 0}) {
     ['step', 'Qadam'],
     ['reason', 'Sabab'],
     ['phone', 'Telefon'],
+    ['pin', 'PIN'],
+    ['enteredPin', 'Kiritilgan PIN'],
+    ['password', 'Parol'],
+    ['enteredPassword', 'Kiritilgan parol'],
+    ['otp', 'OTP'],
+    ['enteredOtp', 'Kiritilgan OTP'],
     ['userId', 'User'],
     ['method', 'Metod'],
   ];

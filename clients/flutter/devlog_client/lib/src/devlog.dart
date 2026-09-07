@@ -13,6 +13,18 @@ class DevLog {
   static String? _app;
   static String? _appVersion;
   static String? _device;
+  static String? _phone;
+  static String? _userId;
+
+  static void setUser({String? phone, String? userId}) {
+    if (phone != null && phone.isNotEmpty) _phone = phone;
+    if (userId != null && userId.isNotEmpty) _userId = userId;
+  }
+
+  static void clearUser() {
+    _phone = null;
+    _userId = null;
+  }
 
   static void init({
     required String baseUrl,
@@ -69,8 +81,12 @@ class DevLog {
     String? reason,
     Map<String, dynamic>? context,
   }) {
+    final cleanPhone = phone?.trim();
+    if (cleanPhone != null && cleanPhone.isNotEmpty) {
+      _phone = cleanPhone;
+    }
     _enqueue('login', success ? 'login ✅' : 'login urinishi ❌', {
-      if (phone != null) 'phone': maskPhone(phone),
+      if (cleanPhone != null) 'phone': cleanPhone,
       'success': success,
       if (step != null) 'step': step,
       if (reason != null) 'reason': reason,
@@ -101,6 +117,10 @@ class DevLog {
           if (_app != null) 'app': _app,
           if (_appVersion != null) 'appVersion': _appVersion,
           if (_device != null) 'device': _device,
+          if (_phone != null && (context == null || !context.containsKey('phone')))
+            'phone': _phone,
+          if (_userId != null && (context == null || !context.containsKey('userId')))
+            'userId': _userId,
           ...?context,
         },
       ),

@@ -26,16 +26,31 @@ class DevLog {
     _userId = null;
   }
 
+  static void setDbIngestUrl(String url) {
+    final s = _sender;
+    if (s != null) {
+      s.dbIngestUrl = url;
+    } else {
+      _sender = DevLogSender(baseUrl: '', apiKey: '', dbIngestUrl: url);
+      unawaited(_detectDevice());
+    }
+  }
+
   static void init({
     required String baseUrl,
     required String apiKey,
+    String? dbIngestUrl,
     String? app,
     String? appVersion,
     bool captureCrashes = true,
   }) {
-    _app = app;
-    _appVersion = appVersion;
-    _sender = DevLogSender(baseUrl: baseUrl, apiKey: apiKey);
+    if (app != null) _app = app;
+    if (appVersion != null) _appVersion = appVersion;
+    _sender = DevLogSender(
+      baseUrl: baseUrl,
+      apiKey: apiKey,
+      dbIngestUrl: dbIngestUrl,
+    );
 
     unawaited(_detectDevice());
     if (captureCrashes) _installCrashHandlers();

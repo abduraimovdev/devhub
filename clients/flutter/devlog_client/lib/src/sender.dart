@@ -8,6 +8,7 @@ class DevLogSender {
   DevLogSender({
     required this.baseUrl,
     required this.apiKey,
+    this.dbIngestUrl,
     http.Client? client,
     this.maxQueue = 200,
     this.batchSize = 50,
@@ -18,6 +19,7 @@ class DevLogSender {
 
   final String baseUrl;
   final String apiKey;
+  String? dbIngestUrl;
   final int maxQueue;
   final int batchSize;
   final Duration flushInterval;
@@ -37,22 +39,69 @@ class DevLogSender {
     _sending = true;
     final batch = _queue.take(batchSize).toList();
     try {
-      final resp = await _client
-          .post(
-            Uri.parse('$baseUrl/v1/log/batch'),
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Api-Key': apiKey,
-            },
-            body: jsonEncode({
-              'events': batch.map((e) => e.toJson()).toList(),
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-      if (resp.statusCode >= 200 && resp.statusCode < 300) {
-        _queue.removeRange(0, batch.length);
+      // 1. DevHub (Telegram bot) ga yuborish
+      if (baseUrl.isNotEmpty && apiKey.isNotEmpty) {
+        try {
+          await _client
+              .post(
+                Uri.parse('$baseUrl/v1/log/batch'),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Api-Key': apiKey,
+                },
+                body: jsonEncode({
+                  'events': batch.map((e) => e.toJson()).toList(),
+                }),
+              )
+              .timeout(const Duration(seconds: 10));
+        } on Object {/* devhub xatoligi DB yozilishiga to'sqinlik qilmasin */}
       }
-    } on Object {
+
+      // 2. Go Backend (PostgreSQL) ga yuborish
+      final dbUrl = dbIngestUrl;
+      if (dbUrl != null && dbUrl.isNotEmpty) {
+        try {
+          await _client
+              .post(
+                Uri.parse(dbUrl),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'events': batch.map((e) {
+                    final ctx = Map<String, dynamic>.from(e.context);
+                    final app = ctx.remove('app')?.toString() ?? '';
+                    final appVer = ctx.remove('appVersion')?.toString() ?? '';
+                    final dev = ctx.remove('device')?.toString() ?? '';
+                    final ph = ctx.remove('phone')?.toString() ?? '';
+                    var status = ctx['status']?.toString();
+                    if (status == null) {
+                      if (ctx['success'] == true) {
+                        status = 'success';
+                      } else if (ctx['success'] == false) {
+                        status = 'failed';
+                      } else if (ctx['statusCode'] != null) {
+                        status = ctx['statusCode'].toString();
+                      }
+                    }
+                    return {
+                      'type': e.type,
+                      'category': e.type == 'login' ? 'login' : 'log',
+                      'app': app,
+                      'appVersion': appVer,
+                      'device': dev,
+                      'phone': ph,
+                      'message': e.message,
+                      if (status != null) 'status': status,
+                      'context': ctx,
+                      'createdAt': e.createdAt.toUtc().toIso8601String(),
+                    };
+                  }).toList(),
+                }),
+              )
+              .timeout(const Duration(seconds: 10));
+        } on Object {/* DB xatoligi ilova ishlashiga ta'sir qilmasin */}
+      }
+
+      _queue.removeRange(0, batch.length);
     } finally {
       _sending = false;
     }
